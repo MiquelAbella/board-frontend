@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useContext } from "react";
 import { userReducer } from "../reducers/userReducer";
-import { create, login } from "../../api/userApi";
+import { create, login, createGoogle, googleLogin } from "../../api/userApi";
 import { userTypes } from "../types/userTypes";
 import { add, remove, updateStatus, updateTodo } from "../../api/todosApi";
 
@@ -17,6 +17,15 @@ export const UserProvider = ({ children }) => {
   const createUser = async (user) => {
     const response = await create(user);
     if (response.ok) {
+      localStorage.setItem("token", response.user.token);
+      dispatch({ type: userTypes.register, payload: response.user });
+    }
+  };
+
+  const createGoogleUser = async (user) => {
+    const response = await createGoogle(user);
+    if (response.ok) {
+      localStorage.setItem("token", response.user.token);
       dispatch({ type: userTypes.register, payload: response.user });
     }
   };
@@ -24,6 +33,14 @@ export const UserProvider = ({ children }) => {
   const loginUser = async (user) => {
     const response = await login(user);
     if (response.ok) {
+      localStorage.setItem("token", response.user.token);
+      dispatch({ type: userTypes.login, payload: response.user });
+    }
+  };
+  const loginGoogleUser = async (user) => {
+    const response = await googleLogin(user);
+    if (response.ok) {
+      localStorage.setItem("token", response.user.token);
       dispatch({ type: userTypes.login, payload: response.user });
     }
   };
@@ -61,7 +78,9 @@ export const UserProvider = ({ children }) => {
       value={{
         ...state,
         createUser,
+        createGoogleUser,
         loginUser,
+        loginGoogleUser,
         addTodo,
         updateTodoStatus,
         deleteTodo,

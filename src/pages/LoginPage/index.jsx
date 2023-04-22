@@ -3,8 +3,14 @@ import { useUser } from "../../context/userContext";
 import { AppLogo } from "./AppLogo";
 import { LoginForm } from "./LoginForm";
 import { RegisterForm } from "./RegisterForm";
+import { getAuth, signInWithPopup } from "firebase/auth";
+import app, { googleProvider } from "../../firebase";
+import { FcGoogle } from "react-icons/fc";
 
-export const LoginPage = () => {
+const LoginPage = () => {
+  const { createGoogleUser, loginGoogleUser } = useUser();
+  const auth = getAuth(app);
+
   const { createUser, loginUser } = useUser();
   const [isLoging, setIsLoging] = useState(true);
 
@@ -27,36 +33,64 @@ export const LoginPage = () => {
     setRegisterValues({ ...registerValues, [e.target.name]: e.target.value });
   };
 
-  const handleSubmitLogin = (e) => {
-    e.preventDefault();
+  const registerWithPopup = async () => {
+    const response = await signInWithPopup(auth, googleProvider);
+    const { email, displayName } = response.user;
+    createGoogleUser({ email, fullName: displayName });
+  };
+
+  const loginWithPopup = async () => {
+    const response = await signInWithPopup(auth, googleProvider);
+    const { email } = response.user;
+    loginGoogleUser(email);
+  };
+
+  const handleSubmitLogin = (loginValues) => {
     loginUser(loginValues);
   };
 
-  const handleSubmitRegister = (e) => {
-    e.preventDefault(e);
+  const handleSubmitRegister = (registerValues) => {
     createUser(registerValues);
   };
 
   return (
-    <div className="bg-white h-screen flex flex-col md:flex-row items-center justify-center ">
+    <div className="bg-white h-screen flex flex-col md:flex-row items-center justify-center relative ">
       <AppLogo />
-      {isLoging ? (
-        <LoginForm
-          handleSubmitLogin={handleSubmitLogin}
-          loginValues={loginValues}
-          setIsLoging={setIsLoging}
-          isLoging={isLoging}
-          handleLoginChange={handleLoginChange}
-        />
-      ) : (
-        <RegisterForm
-          handleSubmitRegister={handleSubmitRegister}
-          registerValues={registerValues}
-          handleRegisterChange={handleRegisterChange}
-          setIsLoging={setIsLoging}
-          isLoging={isLoging}
-        />
-      )}
+      <div className="flex flex-col items-center justify-center bg-blue-500 md:h-screen h-full w-full md:w-1/2">
+        {isLoging ? (
+          <LoginForm
+            handleSubmitLogin={handleSubmitLogin}
+            loginValues={loginValues}
+            setIsLoging={setIsLoging}
+            isLoging={isLoging}
+            handleLoginChange={handleLoginChange}
+          />
+        ) : (
+          <RegisterForm
+            handleSubmitRegister={handleSubmitRegister}
+            registerValues={registerValues}
+            handleRegisterChange={handleRegisterChange}
+            setIsLoging={setIsLoging}
+            isLoging={isLoging}
+          />
+        )}
+        <div className="flex gap-4">
+          <button
+            onClick={registerWithPopup}
+            className="bg-white px-2 py-1 flex items-center justify-between gap-2 rounded-md"
+          >
+            Register <FcGoogle />
+          </button>
+          <button
+            onClick={loginWithPopup}
+            className="bg-white px-2 py-1 flex items-center justify-between gap-2 rounded-md"
+          >
+            Login <FcGoogle />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
+
+export default LoginPage;

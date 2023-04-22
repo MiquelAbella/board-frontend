@@ -1,24 +1,20 @@
-import React from "react";
-import { useUser } from "../../context/userContext";
 import { useState } from "react";
+import { useUser } from "../../context/userContext";
 import { TodosContainer } from "../../components/TodosContainer";
+import { useForm } from "react-hook-form";
 
-export const MainPage = () => {
+const MainPage = () => {
   const { user, addTodo, deleteTodo } = useUser();
   const { todos } = user;
 
-  const [todoText, setTodoText] = useState("");
   const [draggedTodo, setDraggedTodo] = useState(null);
   const [isDeleteButtonVisible, setIsDeleteButtonVisible] = useState(false);
 
-  const handleChangeTodoText = (e) => {
-    setTodoText(e.target.value);
-  };
+  const { register, handleSubmit, reset } = useForm();
 
-  const handleAddTodo = (e) => {
-    e.preventDefault();
-    addTodo(todoText, user._id);
-    setTodoText("");
+  const onSubmit = (data) => {
+    addTodo(data.todoText, user._id);
+    reset();
   };
 
   const pendingTodos = todos.filter((todo) => {
@@ -60,16 +56,20 @@ export const MainPage = () => {
 
   return (
     <div className="flex flex-col  items-center justify-start min-h-screen bg-blue-500">
-      <form onSubmit={handleAddTodo} className="mt-4 flex gap-2">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 flex gap-2">
         <input
           id="addTodo"
           type="text"
           placeholder="Add"
-          value={todoText}
-          onChange={handleChangeTodoText}
-          className="rounded-md py-2 px-4"
+          {...register("todoText")}
+          className="rounded-md py-2 px-4 outline-none"
         />
-        <button className="bg-green-500 text-white w-20 rounded-md">Add</button>
+        <button
+          type="submit"
+          className="bg-green-500 text-white w-20 rounded-md"
+        >
+          Add
+        </button>
       </form>
       <div className="flex flex-col md:flex-row h-full w-full">
         <TodosContainer
@@ -114,3 +114,5 @@ export const MainPage = () => {
     </div>
   );
 };
+
+export default MainPage;
