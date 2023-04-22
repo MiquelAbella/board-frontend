@@ -8,10 +8,10 @@ import app, { googleProvider } from "../../firebase";
 import { FcGoogle } from "react-icons/fc";
 
 const LoginPage = () => {
-  const { createGoogleUser, loginGoogleUser } = useUser();
+  const { createGoogleUser, loginGoogleUser, createUser, loginUser } =
+    useUser();
   const auth = getAuth(app);
 
-  const { createUser, loginUser } = useUser();
   const [isLoging, setIsLoging] = useState(true);
 
   const [loginValues, setLoginValues] = useState({
