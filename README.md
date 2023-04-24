@@ -25,3 +25,4 @@ Start the server
   npm run dev
 ```
 
+*To facilitate the installation of the project, I have attached the firebase.js file. This way, it is not necessary to register the application in Firebase.
